@@ -10,7 +10,7 @@ export default function LeftPanel() {
         via-[#0F2B40]
         to-[#0F0C29] gap-y-9 w-1/3"
     >
-      <Logo />
+      <Logo width={300} height={300} />
       <h2 className="text-3xl font-bold text-center text-white">
         Conectando
         <br />
