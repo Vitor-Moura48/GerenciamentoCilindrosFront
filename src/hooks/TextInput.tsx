@@ -9,6 +9,8 @@ type Props = {
   onChange?: (v: string) => void;
   type?: string;
   icon?: React.ElementType;
+  className?: string;
+  disableDefaultStyles?: boolean;
 };
 
 export default function TextInput({
@@ -18,6 +20,8 @@ export default function TextInput({
   onChange,
   type = "text",
   icon: Icon,
+  className,
+  disableDefaultStyles = false,
 }: Props) {
   return (
     <div className="relative">
@@ -42,11 +46,16 @@ export default function TextInput({
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
         placeholder={placeholder}
-        className={`
-          w-full border border-gray-700 dark:border-gray-600 p-4 rounded-sm
-          focus:outline-none focus:ring-2
-          ${Icon ? "pl-12" : "pl-4"}
-        `}
+        className={
+          disableDefaultStyles
+            ? className ?? ""
+            : `
+        w-full border border-gray-700 dark:border-gray-600 p-4 rounded-sm
+        focus:outline-none focus:ring-2
+        ${Icon ? "pl-12" : "pl-4"}
+        ${className ?? ""}
+      `
+        }
       />
     </div>
   );
