@@ -1,13 +1,18 @@
 import Image from "next/image";
 
-export default function Logo() {
+interface LogoProps {
+  width: number;
+  height: number;
+}
+
+export default function Logo({ width, height }: LogoProps) {
   return (
     <div>
       <Image
         src="/logo oxitech.svg"
         alt="Logo Oxitech"
-        width={300}
-        height={300}
+        width={width}
+        height={height}
       />
     </div>
   );
