@@ -10,23 +10,28 @@ import {
   User,
 } from "lucide-react";
 import Logo from "./Logo";
-import { useState } from "react";
+import Link from "next/link"; // 1. Importe o Link
+import { usePathname } from "next/navigation"; // Opcional, mas recomendado para o estado ativo
 
 export default function SideBar() {
-  const [activeItem, setActiveItem] = useState("Dashboard");
+  const pathname = usePathname();
 
   const menuItems = [
-    { name: "Dashboard", icon: <LayoutDashboard /> },
-    { name: "Movimentações de cilindros", icon: <ArrowRightLeft /> },
-    { name: "Estoque de Cilindros", icon: <Archive /> },
-    { name: "Setores do hospital", icon: <Building2 /> },
-    { name: "Configurações", icon: <Settings /> },
-    { name: "Conta", icon: <User /> },
-    { name: "Ajuda", icon: <HelpCircle /> },
+    { name: "Dashboard", icon: <LayoutDashboard />, href: "/dashboard" },
+    {
+      name: "Movimentações de cilindros",
+      icon: <ArrowRightLeft />,
+      href: "/cylinder-movements",
+    },
+    { name: "Estoque de Cilindros", icon: <Archive />, href: "/estoque" },
+    { name: "Setores do hospital", icon: <Building2 />, href: "/sectors" },
+    { name: "Configurações", icon: <Settings />, href: "/configuracoes" },
+    { name: "Conta", icon: <User />, href: "/profile" },
+    { name: "Ajuda", icon: <HelpCircle />, href: "/ajuda" },
   ];
 
   return (
-    <aside className="flex flex-col h-screen w-1/5 p-4 bg-gradient-to-b from-[#0F2B40] to-[#0F0C29] gap-y-8">
+    <aside className="flex flex-col min-h-screen w-1/5 p-4 bg-gradient-to-b from-[#0F2B40] to-[#0F0C29] gap-y-8">
       <div className="flex items-center gap-x-3">
         <Logo width={40} height={40} />
         <span className="text-xl font-bold text-white tracking-wider">
@@ -37,17 +42,21 @@ export default function SideBar() {
         <span className="text-sm font-semibold text-gray-400 px-3">Menu</span>
         <ul className="flex flex-col gap-y-1">
           {menuItems.map((item) => (
-            <li
-              key={item.name}
-              onClick={() => setActiveItem(item.name)}
-              className={`flex items-center gap-x-3 p-2 rounded-md cursor-pointer ${
-                activeItem === item.name
-                  ? "bg-white text-[#0F2B40]"
-                  : "text-white hover:bg-white/10"
-              }`}
-            >
-              {item.icon}
-              <span className="font-medium">{item.name}</span>
+            <li key={item.name}>
+              {" "}
+              {/* A key fica no elemento da lista */}
+              <Link
+                href={item.href}
+                className={`flex items-center gap-x-3 p-2 rounded-md cursor-pointer ${
+                  // Lógica de estilo para o item ativo (usando a URL atual)
+                  pathname === item.href
+                    ? "bg-white text-[#0F2B40]"
+                    : "text-white hover:bg-white/10"
+                }`}
+              >
+                {item.icon}
+                <span className="font-medium">{item.name}</span>
+              </Link>
             </li>
           ))}
         </ul>
