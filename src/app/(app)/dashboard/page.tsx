@@ -28,7 +28,7 @@ const cylinders = [
   { id: "96854", location: "UT1", status: "Disponível" },
   { id: "874521", location: "UT1", status: "Disponível" },
   { id: "484621", location: "UT1", status: "Disponível" },
-  { id: "12365", location: "UT1", status: "Disponível" },
+  { id: "123465", location: "UT1", status: "Disponível" },
   { id: "1234565", location: "UT1", status: "Disponível" },
   { id: "3465", location: "UT1", status: "Disponível" },
   { id: "23452", location: "UT1", status: "Disponível" },
