@@ -65,8 +65,8 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-4 gap-4">
-          {cylinders.map((cylinder, index) => (
-            <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg">
+          {cylinders.map((cylinder) => (
+            <div key={cylinder.id} className="flex items-center space-x-3 p-3 border rounded-lg">
               <div className="w-8 h-12 bg-teal-600 rounded flex items-center justify-center">
                 <MapPin className="w-4 h-4 text-white" />
               </div>
