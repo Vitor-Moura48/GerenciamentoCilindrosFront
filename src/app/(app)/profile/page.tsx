@@ -16,7 +16,7 @@ export default function ProfilePage() {
             <StaticField label="Cargo" value="Administrador" />
 
             <Button
-              className="bg-[#0F2B40] text-white py-3 px-4 rounded-sm flex mx-auto cursor-pointer active:bg-[#0C1E30]"
+              className="bg-[#0F2B40] text-white dark:bg-[#686868] dark:text-[#0F2B40] py-3 px-4 rounded-sm flex mx-auto cursor-pointer active:bg-[#0C1E30]"
               type="submit"
             >
               Recuperar Matrícula
