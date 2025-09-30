@@ -15,6 +15,8 @@ type ReusableTableProps<T> = {
   columns: ColumnDefinition<T>[];
   onAddRecord?: () => void;
   addRecordButtonText?: string;
+  onRowClick?: (record: T) => void;
+  enableRowClick?: boolean;
 };
 
 export default function Table<T extends object>({
@@ -22,6 +24,8 @@ export default function Table<T extends object>({
   columns,
   onAddRecord,
   addRecordButtonText,
+  enableRowClick,
+  onRowClick,
 }: ReusableTableProps<T>) {
   return (
     <div className="flex w-full flex-col items-center gap-4">
@@ -48,7 +52,9 @@ export default function Table<T extends object>({
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {data.map((item, rowIndex) => (
-                <tr key={rowIndex} className="hover:bg-gray-50">
+                <tr key={rowIndex} 
+                onClick={enableRowClick && onRowClick ? () => onRowClick(item) : undefined}
+                className="hover:bg-gray-50">
                   {columns.map((column, colIndex) => (
                     <td
                       key={`${rowIndex}-${colIndex}`}
