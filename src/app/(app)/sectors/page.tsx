@@ -13,7 +13,7 @@ export default function ProfilePage() {
                 
                 <div className="w-full overflow-y-auto">
                     
-                    <h2 className="text-lg mb-4">Status</h2>
+                    <h2 className="text-2xl font-bold mb-6 text-gray-700">Status</h2>
 
                     {nomes.map((nome, index) => (
                         <Panel key={index} className="mb-6 flex items-center !p-4 justify-between ">

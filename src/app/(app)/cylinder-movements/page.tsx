@@ -59,7 +59,7 @@ const sampleData: CylinderMovement[] = [
   },
 ];
 
-export default function CylinderMovements() {
+export default function CylinderMovementsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const columns: ColumnDefinition<CylinderMovement>[] = [
