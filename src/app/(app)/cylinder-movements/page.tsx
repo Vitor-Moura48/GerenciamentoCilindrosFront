@@ -6,57 +6,21 @@ import Button from "@/components/Button";
 import TextInput from "@/hooks/TextInput";
 
 type CylinderMovement = {
-  idCilindro: number;
+  id_cilindro: number;
   destino: string;
   pressao: number;
-  idFuncionario: number;
+  percentual_respirador: number;
+  id_funcionario: number;
 };
 
 const sampleData: CylinderMovement[] = [
   {
-    idCilindro: 4353,
+    id_cilindro: 4353,
     destino: "EMERGÊNCIA",
     pressao: 170,
-    idFuncionario: 367543543,
-  },
-  {
-    idCilindro: 34655,
-    destino: "EMERGÊNCIA",
-    pressao: 140,
-    idFuncionario: 345634523,
-  },
-  { idCilindro: 43534, destino: "UTI", pressao: 250, idFuncionario: 2543264 },
-  {
-    idCilindro: 234,
-    destino: "EMERGÊNCIA",
-    pressao: 120,
-    idFuncionario: 2433456436,
-  },
-  {
-    idCilindro: 34643,
-    destino: "ENFERMARIA",
-    pressao: 250,
-    idFuncionario: 65756657324,
-  },
-  { idCilindro: 23532, destino: "UTI", pressao: 100, idFuncionario: 4354353 },
-  {
-    idCilindro: 235434,
-    destino: "ENFERMARIA",
-    pressao: 180,
-    idFuncionario: 6576587,
-  },
-  {
-    idCilindro: 90897,
-    destino: "ENFERMARIA",
-    pressao: 120,
-    idFuncionario: 32435345,
-  },
-  {
-    idCilindro: 65743,
-    destino: "EMERGÊNCIA",
-    pressao: 190,
-    idFuncionario: 43543625,
-  },
+    percentual_respirador: 15,
+    id_funcionario: 367543543
+  }
 ];
 
 export default function CylinderMovementsPage() {
@@ -64,7 +28,7 @@ export default function CylinderMovementsPage() {
 
   const columns: ColumnDefinition<CylinderMovement>[] = [
     {
-      accessorKey: "idCilindro",
+      accessorKey: "id_cilindro",
       header: "ID Cilindro",
     },
     {
@@ -77,7 +41,11 @@ export default function CylinderMovementsPage() {
       header: "Pressão",
     },
     {
-      accessorKey: "idFuncionario",
+      accessorKey: "percentual_respirador",
+      header: "Percentual Respirador"
+    },
+    {
+      accessorKey: "id_funcionario",
       header: "ID Funcionário",
       isSortable: true,
     },

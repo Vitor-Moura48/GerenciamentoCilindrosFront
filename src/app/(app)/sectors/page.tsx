@@ -3,9 +3,18 @@
 import Panel from "@/components/Panel";
 import InfoItem from "@/components/InfoItem";
 import { ChevronRight } from "lucide-react";
+import { useSectors } from "@/hooks/useSectors";
 
-export default function ProfilePage() {
-    const nomes = ["Painel 1", "Painel 2", "Painel 3", "Painel 4", "Painel 5", "Painel 6", "Painel 7"];
+export default function SectorsPage() {
+    const { sectors, cylinderCounts, isLoading, error} = useSectors();
+
+    if (isLoading) {
+        return <div>Carregando setores...</div>;
+    }
+
+    if (error) {
+        return <div>Ocorreu um erro ao buscar os dados: {error.message}</div>
+    }
 
     return (
         <div className="min-h-screen flex">
@@ -15,19 +24,21 @@ export default function ProfilePage() {
                     
                     <h2 className="text-2xl font-bold mb-6 text-gray-700">Status</h2>
 
-                    {nomes.map((nome, index) => (
-                        <Panel key={index} className="mb-6 flex items-center !p-4 justify-between ">
+                    {sectors.map((sector) => (
+                        <Panel key={sector.id_setor} className="mb-6 flex items-center !p-4 justify-between ">
                             
-                            <h2 className="text-lg mb-0 font-bold">{nome}</h2>
+                            <h2 className="text-lg mb-0 font-bold">{sector.setor}</h2>
                             
-                            <InfoItem label="Id" value="4366472" label2="Quantidade" value2="38"></InfoItem>
-                            
-                             <button
-                                onClick={() => alert("Abrir detalhes do Setor")}
-                                className="white/5 dark:slate-800/60 hover:text-gray-600 dark:hover:text-gray-500 p-1"
-                            >
-                                <ChevronRight size={32}/>
-                            </button>
+                            <div className="flex items-center gap-4">
+                                <InfoItem label="Id" value={sector.id_setor} label2="Quantidade" value2={cylinderCounts[sector.id_setor] || 0}></InfoItem>
+                                
+                                <button
+                                    onClick={() => alert("Abrir detalhes do Setor")}
+                                    className="white/5 dark:slate-800/60 hover:text-gray-600 dark:hover:text-gray-500 p-1"
+                                >
+                                    <ChevronRight size={32}/>
+                                </button>
+                            </div>
 
                         </Panel>
                     ))}
