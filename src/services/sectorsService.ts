@@ -21,7 +21,7 @@ export const sectorsShowInformations = async ({
 }: AccessTokenView): Promise<SectorsResultNameAndId[]> => {
   
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-    const url = `${API_BASE_URL}/setores`;
+    const url = `${API_BASE_URL}/setores/`;
 
     try {
         const response = await fetch(url, {
@@ -46,7 +46,7 @@ export const SectorsQuantityCylinder = async ({
     accessToken,
 }: AccessTokenView): Promise<SectorsResultQuantity[]> => {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-    const url = `${API_BASE_URL}/locais_recebe_cilindro`;
+    const url = `${API_BASE_URL}/locais_recebe_cilindro/`;
 
     try {
         const response = await fetch(url, {

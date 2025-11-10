@@ -182,7 +182,7 @@ export const ShowSetor = async ({
 export const SectorsQuantityCylinder = async ({
     accessToken,
 }: AccessTokenView): Promise<LocalConsomeCilindro[]> => {
-    const url = `${API_BASE_URL}/locais_consome_cilindro`;
+    const url = `${API_BASE_URL}/locais_consome_cilindro/`;
     try {
         const response = await fetch(url, {
             headers: { 'Authorization': `Bearer ${accessToken}` }
