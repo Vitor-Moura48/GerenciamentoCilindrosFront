@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Settings,
   User,
+  Clock,
 } from "lucide-react";
 import Logo from "./Logo";
 import Link from "next/link"; // 1. Importe o Link
@@ -24,10 +25,8 @@ export default function SideBar() {
       href: "/cylinder-movements",
     },
     { name: "Estoque de Cilindros", icon: <Archive />, href: "/estoque" },
-    { name: "Setores do hospital", icon: <Building2 />, href: "/sectors" },
-    { name: "Configurações", icon: <Settings />, href: "/configuracoes" },
-    { name: "Conta", icon: <User />, href: "/profile" },
-    { name: "Ajuda", icon: <HelpCircle />, href: "/ajuda" },
+    { name: "Setores do Hospital", icon: <Building2 />, href: "/sectors" },
+    { name: "Análise de Autonomia", icon: <Clock/>, href: "/autonomy-analyse"},
   ];
 
   return (
