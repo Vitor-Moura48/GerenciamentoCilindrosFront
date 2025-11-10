@@ -69,7 +69,11 @@ export const authOptions: NextAuthOptions = {
           }
 
           const user: ApiUser = await res.json();
-          return { ...user, id: String(user.id_usuario) };
+          if (user && user.id_usuario) {
+            return { ...user, id: String(user.id_usuario) };
+          }
+          console.error("API de autenticação não retornou um id_usuario válido.");
+          return null;
         } catch (error) {
           console.error("Erro ao conectar API de auth:", error);
           return null;

@@ -7,6 +7,5 @@ export const config = {
     "/estoque/:path*",
     "/sectors/:path*",
     "/autonomy-analyse/:path*",
-    "/profile/:path*",
   ],
 };

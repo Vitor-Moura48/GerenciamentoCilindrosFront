@@ -1,112 +1,167 @@
 "use client";
+
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useMovimentacoes, TabelaMovimentacaoItem } from "@/hooks/useCylinderMovements";
 import Table, { ColumnDefinition } from "@/hooks/Table";
 import Modal from "@/components/Modal";
 import Button from "@/components/Button";
-import TextInput from "@/hooks/TextInput";
+import LoadingSpinner from "@/components/LoadingSpinner"; 
 
-type CylinderMovement = {
-  id_cilindro: number;
-  destino: string;
-  pressao: number;
-  percentual_respirador: number;
-  id_funcionario: number;
+const ErrorMessage = ({ message }: { message: string }) => <div className="p-10 text-center text-red-600">Erro: {message}</div>;
+
+interface NewMovimentacaoForm {
+    codigo_serial: string;
+    id_setor: string;
+    pressao: string;
+    percentual_respirador: string;
+}
+
+const INITIAL_FORM_STATE: NewMovimentacaoForm = {
+    codigo_serial: '',
+    id_setor: '',
+    pressao: '',
+    percentual_respirador: '',
 };
 
-const sampleData: CylinderMovement[] = [
-  {
-    id_cilindro: 4353,
-    destino: "EMERGÊNCIA",
-    pressao: 170,
-    percentual_respirador: 15,
-    id_funcionario: 367543543
-  }
-];
+export default function MovimentacaoPage() {
+    const { data: session } = useSession();
+    const accessToken = session?.accessToken;
+    const userId = session?.user?.id; 
 
-export default function CylinderMovementsPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+    const { dados, isLoading, error, setores, addMovimentacao } = useMovimentacoes(accessToken ?? null);
 
-  const columns: ColumnDefinition<CylinderMovement>[] = [
-    {
-      accessorKey: "id_cilindro",
-      header: "ID Cilindro",
-    },
-    {
-      accessorKey: "destino",
-      header: "Destino",
-      isSortable: true,
-    },
-    {
-      accessorKey: "pressao",
-      header: "Pressão",
-    },
-    {
-      accessorKey: "percentual_respirador",
-      header: "Percentual Respirador"
-    },
-    {
-      accessorKey: "id_funcionario",
-      header: "ID Funcionário",
-      isSortable: true,
-    },
-  ];
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [formState, setFormState] = useState<NewMovimentacaoForm>(INITIAL_FORM_STATE);
+    const [formError, setFormError] = useState<string | null>(null);
 
-  const handleAdd = () => {
-    setIsModalOpen(true);
-  };
+    // Definição das colunas para a tabela dinâmica
+    const columns: ColumnDefinition<TabelaMovimentacaoItem>[] = [
+        { header: "Código Serial", accessorKey: "codigo_serial" },
+        { header: "Destino", accessorKey: "destino" },
+        { header: "Pressão", accessorKey: "pressao" },
+        { header: "Percentual Respirador", accessorKey: "percentual_respirador" },
+        { header: "Matrícula", accessorKey: "matricula" },
+        { header: "Data do Consumo", accessorKey: "data_consumo" },
+    ];
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+    const handleOpenModal = () => {
+        if (setores.length > 0) {
+            setFormState({ ...INITIAL_FORM_STATE, id_setor: String(setores[0].id_setor) });
+        } else {
+            setFormState(INITIAL_FORM_STATE);
+        }
+        setFormError(null);
+        setIsModalOpen(true);
+    };
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8 bg-gray-100">
-      <h1 className="text-2xl font-bold mb-6 text-gray-700">
-        Movimentação de Cilindros
-      </h1>
+    const handleChange = (field: keyof NewMovimentacaoForm, value: string) => {
+        setFormState(prev => ({ ...prev, [field]: value }));
+    };
 
-      <Table
-        data={sampleData}
-        columns={columns}
-        onAddRecord={handleAdd}
-        addRecordButtonText={"Adicionar Registro"}
-      />
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setFormError(null);
+        if (!userId) {
+            setFormError("Usuário não autenticado.");
+            return;
+        }
 
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-        <h2 className="text-black text-xl font-bold mb-4">Novo Registro</h2>
-        <div className="flex flex-col gap-4">
-          <p className="text-black">Id Cilindro</p>
-          <TextInput
-            type="text"
-            placeholder="ID Cilindro"
-            className="w-full border border-gray-300 p-2 rounded-md text-black"
-            name={"Id Cilindro"}
-            disableDefaultStyles={true}
-          />
-          <p className="text-black">Setor</p>
-          <select className="border border-[#0a0a0a] p-2 rounded-md text-black">
-            <option>UTI</option>
-            <option>Emergência</option>
-            <option>Enfermaria</option>
-          </select>
-          <p className="text-black">Pressão</p>
-          <TextInput
-            type="text"
-            placeholder="Pressão"
-            className={
-              "w-full border border-gray-300 p-2 rounded-md text-black"
-            }
-            name={"Pressão"}
-            disableDefaultStyles={true}
-          />
-          <Button
-            className="cursor-pointer text-white bg-[#1F384C] py-2 px-3 rounded-sm hover:bg-[#16324F] transition"
-            onClick={handleCloseModal}
-          >
-            Adicionar
-          </Button>
+        try {
+            await addMovimentacao({
+                codigo_serial: formState.codigo_serial,
+                id_setor: Number(formState.id_setor),
+                pressao: Number(formState.pressao),
+                percentual_respirador: Number(formState.percentual_respirador),
+            }, Number(userId));
+            setIsModalOpen(false);
+        } catch (apiError: any) {
+            setFormError(apiError.message || "Ocorreu um erro.");
+        }
+    };
+
+    if (isLoading && dados.length === 0) {
+        return (
+            <div className="flex justify-center items-center p-10">
+                <LoadingSpinner size={48} />
+            </div>
+        );
+    };
+    if (error) return <ErrorMessage message={error.message} />;
+
+    return (
+        <div className="p-6 flex justify-center">
+            <div className="w-full max-w-6xl bg-white rounded-2xl shadow p-6">
+                <h2 className="text-xl font-bold mb-4 text-gray-700">Movimentação de Cilindros</h2>
+                <Table
+                    data={dados} 
+                    columns={columns}
+                    onAddRecord={handleOpenModal}
+                    isAddRecordDisabled={setores.length === 0}
+                    addRecordButtonText={"Adicionar Registro"}
+                />
+            </div>
+
+            {/* Modal de Adição */}
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <form className="flex flex-col text-black space-y-4 p-4 w-full max-w-sm mx-auto" onSubmit={handleSubmit}>
+                    <h3 className="text-xl font-semibold text-center mb-2">Registrar Movimentação</h3>
+                    
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Código Serial do Cilindro *</label>
+                        <input
+                            type="text"
+                            placeholder="Código Serial"
+                            className="w-full border border-gray-300 p-2 rounded-md text-black"
+                            name={"codigo_serial"}
+                            value={formState.codigo_serial}
+                            onChange={e => handleChange('codigo_serial', e.target.value)}
+                        />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Setor de Destino *</label>
+                        <select 
+                            value={formState.id_setor} 
+                            onChange={e => handleChange('id_setor', e.target.value)} 
+                            className="w-full border rounded px-3 py-2 bg-white"
+                        >
+                            {setores.map(setor => (
+                                <option key={setor.id_setor} value={setor.id_setor}>{setor.setor}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Pressão *</label>
+                        <input
+                            type="number"
+                            placeholder="Pressão"
+                            className="w-full border border-gray-300 p-2 rounded-md text-black"
+                            name={"pressao"}
+                            value={formState.pressao}
+                            onChange={e => handleChange('pressao', e.target.value)}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Percentual Respirador *</label>
+                        <input
+                            type="number"
+                            placeholder="Percentual Respirador"
+                            className="w-full border border-gray-300 p-2 rounded-md text-black"
+                            name={"percentual_respirador"}
+                            value={formState.percentual_respirador}
+                            onChange={e => handleChange('percentual_respirador', e.target.value)}
+                        />
+                    </div>
+
+                    {formError && <p className="text-red-600 text-sm text-center">{formError}</p>}
+                    <Button type="submit" className="w-full cursor-pointer text-white bg-[#1F384C] py-2 px-3 rounded-sm hover:opacity-90 mt-4">
+                        Adicionar Registro
+                    </Button>
+                </form>
+            </Modal>
         </div>
-      </Modal>
-    </main>
-  );
+    );
 }

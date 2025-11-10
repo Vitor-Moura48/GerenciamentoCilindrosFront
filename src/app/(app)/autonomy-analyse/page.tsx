@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import { useAutonomyAnalyse } from "@/hooks/useAutonomyAnalyse";
 import { formatMinutesToHoursAndMinutes } from "@/utils/timeFormatter";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function AutonomyAnalysePage() {
   const {
@@ -70,9 +71,15 @@ export default function AutonomyAnalysePage() {
               required
             />
           </div>
-          <button type="submit" disabled={isLoading || sessionStatus !== 'authenticated'} className="w-full bg-[#0F2B40] text-white py-3 px-4 rounded-sm flex items-center justify-between hover:bg-opacity-90 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
-            <span>{isLoading ? "VERIFICANDO..." : "VERIFICAR"}</span>
-            <ArrowRight className="h-5 w-5" />
+          <button type="submit" disabled={isLoading || sessionStatus !== 'authenticated'} className={`w-full bg-[#0F2B40] text-white py-3 px-4 rounded-sm flex items-center transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed ${isLoading ? 'justify-center' : 'justify-between hover:bg-opacity-90'}`}>
+            {isLoading ? (
+              <LoadingSpinner size={20} />
+            ) : (
+              <>
+                <span>VERIFICAR</span>
+                <ArrowRight className="h-5 w-5" />
+              </>
+            )}
           </button>
         </form>
 

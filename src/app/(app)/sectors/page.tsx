@@ -2,14 +2,18 @@
 
 import Panel from "@/components/Panel";
 import InfoItem from "@/components/InfoItem";
-import { ChevronRight } from "lucide-react";
 import { useSectors } from "@/hooks/useSectors";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function SectorsPage() {
     const { sectors, cylinderCounts, isLoading, error} = useSectors();
 
     if (isLoading) {
-        return <div>Carregando setores...</div>;
+        return (
+            <div className="flex justify-center items-center p-10">
+                <LoadingSpinner size={48} />
+            </div>
+        );
     }
 
     if (error) {
@@ -36,7 +40,6 @@ export default function SectorsPage() {
                                     onClick={() => alert("Abrir detalhes do Setor")}
                                     className="white/5 dark:slate-800/60 hover:text-gray-600 dark:hover:text-gray-500 p-1"
                                 >
-                                    <ChevronRight size={32}/>
                                 </button>
                             </div>
 

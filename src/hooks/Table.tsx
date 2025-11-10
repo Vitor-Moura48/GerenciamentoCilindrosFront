@@ -1,3 +1,5 @@
+// components/Table.tsx
+
 "use client";
 
 import React from "react";
@@ -17,6 +19,7 @@ type ReusableTableProps<T> = {
   addRecordButtonText?: string;
   onRowClick?: (record: T) => void;
   enableRowClick?: boolean;
+  isAddRecordDisabled?: boolean; // Prop para desabilitar o botão
 };
 
 export default function Table<T extends object>({
@@ -26,6 +29,7 @@ export default function Table<T extends object>({
   addRecordButtonText,
   enableRowClick,
   onRowClick,
+  isAddRecordDisabled, // Recebe a prop
 }: ReusableTableProps<T>) {
   return (
     <div className="flex w-full flex-col items-center gap-4">
@@ -52,9 +56,15 @@ export default function Table<T extends object>({
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {data.map((item, rowIndex) => (
-                <tr key={rowIndex} 
-                onClick={enableRowClick && onRowClick ? () => onRowClick(item) : undefined}
-                className="hover:bg-gray-50">
+                <tr
+                  key={rowIndex}
+                  onClick={
+                    enableRowClick && onRowClick
+                      ? () => onRowClick(item)
+                      : undefined
+                  }
+                  className="hover:bg-gray-50"
+                >
                   {columns.map((column, colIndex) => (
                     <td
                       key={`${rowIndex}-${colIndex}`}
@@ -70,10 +80,11 @@ export default function Table<T extends object>({
         </div>
       </div>
       <Button
-        className="cursor-pointer text-white bg-[#1F384C] py-2 px-3 rounded-sm"
+        className="cursor-pointer text-white bg-[#1F384C] py-2 px-3 rounded-sm disabled:bg-gray-400 disabled:cursor-not-allowed" // Estilos para desabilitado
         onClick={onAddRecord}
+        disabled={isAddRecordDisabled} // Aplica a prop
       >
-        {addRecordButtonText}
+        {addRecordButtonText || "Adicionar Registro"}
       </Button>
     </div>
   );

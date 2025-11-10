@@ -66,4 +66,3 @@ export const SectorsQuantityCylinder = async ({
         throw error;
     }
 }
-
