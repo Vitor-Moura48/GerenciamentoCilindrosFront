@@ -15,7 +15,7 @@ interface ApiUser {
 
 async function refreshAccessToken(token: JWT) {
   try {
-    const res = await fetch("http://localhost:8000/auth/refresh", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh_token: token.refreshToken }),
@@ -27,18 +27,17 @@ async function refreshAccessToken(token: JWT) {
       throw refreshedTokens;
     }
 
-    // Atualiza o token com os novos valores recebidos da API
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
       accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Usa o novo refresh token se ele for enviado
+      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, 
     };
   } catch (error) {
     console.error("Erro ao atualizar o token de acesso:", error);
     return {
       ...token,
-      error: "RefreshAccessTokenError", // Sinaliza um erro para o cliente
+      error: "RefreshAccessTokenError", 
     };
   }
 }
@@ -53,7 +52,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          const res = await fetch("http://localhost:8000/auth/login", {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -82,11 +81,11 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: "/", // ajuste conforme sua rota
+    signIn: "/", 
   },
   callbacks: {
     async jwt({ token, user }) {
-      // 1. No primeiro login (objeto `user` existe)
+     
       if (user) {
         console.log("Objeto User no callback JWT:", user);
         token.accessToken = user.access_token;
@@ -99,13 +98,13 @@ export const authOptions: NextAuthOptions = {
         return token;
       }
 
-      // 2. Em requisições subsequentes, verifique se o token expirou
+      
       if (Date.now() < (token.accessTokenExpires as number)) {
-        // Se não expirou, retorne o token atual
+       
         return token;
       }
 
-      // 3. Se expirou, tente atualizá-lo
+      
       return refreshAccessToken(token);
     },
     async session({ session, token }) {

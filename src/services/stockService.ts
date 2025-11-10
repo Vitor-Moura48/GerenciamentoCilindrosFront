@@ -80,7 +80,7 @@ type ShowFuncionarioProps = FuncionarioParam & AccessTokenView;
 type ShowSetorProps = SetorParam & AccessTokenView;
 type ShowCilindroProps = CilindroParam & AccessTokenView;
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
 export const fetchAllSectors = async ({ accessToken }: AccessTokenView): Promise<SetorCompleto[]> => {
