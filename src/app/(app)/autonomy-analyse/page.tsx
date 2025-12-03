@@ -1,5 +1,6 @@
 "use client";
 
+
 import { ArrowRight } from "lucide-react";
 import { useAutonomyAnalyse } from "@/hooks/useAutonomyAnalyse";
 import { formatMinutesToHoursAndMinutes } from "@/utils/timeFormatter";
