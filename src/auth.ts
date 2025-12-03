@@ -1,4 +1,4 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 
@@ -48,7 +48,7 @@ async function refreshAccessToken(token: JWT) {
   }
 }
 
-export const authOptions: NextAuthOptions = {
+const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
     Credentials({
@@ -146,9 +146,7 @@ export const authOptions: NextAuthOptions = {
       }
     }
   }
-};
-
-const handler = NextAuth(authOptions);
+});
 
 export { handler as GET, handler as POST };
 
