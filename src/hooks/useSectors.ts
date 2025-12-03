@@ -51,7 +51,7 @@ export const useSectors = (): UseSectorsReturn => {
           }, {} as SectorCylinderCounts);
 
          
-          const sectorList = sectorsData.setores || [];
+          const sectorList = sectorsData || [];
 
          
           setSectors(sectorList);

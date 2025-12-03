@@ -25,14 +25,14 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const sectorsShowInformations = async (): Promise<{ setores: SectorsResultNameAndId[] }> => {
 
-    const url = `${API_BASE_URL}/setores`;
+    const url = `${API_BASE_URL}/setores/`;
 
     return await api<{ setores: SectorsResultNameAndId[] }>(url);
 };
 
 export const SectorsQuantityCylinder = async (): Promise<{ list_local_recebe_cilindro: SectorsResultQuantity[] }> => {
     
-    const url = `${API_BASE_URL}/locais_recebe_cilindro`;
+    const url = `${API_BASE_URL}/locais_recebe_cilindro/`;
 
    
     return await api<{ list_local_recebe_cilindro: SectorsResultQuantity[] }>(url);

@@ -108,7 +108,7 @@ export const ShowSetor = async ({
 }
 
 export const SectorsQuantityCylinder = async (): Promise<LocalConsomeCilindro[]> => {
-    const url = `${API_BASE_URL}/locais_consome_cilindro`;
+    const url = `${API_BASE_URL}/locais_consome_cilindro/`;
     const responseData = await api<{ list_local_consome_cilindro?: LocalConsomeCilindro[] }>(url);
     
     if (Array.isArray(responseData.list_local_consome_cilindro)) {

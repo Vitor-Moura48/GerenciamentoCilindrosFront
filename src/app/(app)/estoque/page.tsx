@@ -189,10 +189,13 @@ export default function EstoquePage() {
 
             setIsAddModalOpen(false);
 
-        } catch (apiError: any) {
+        } catch (apiError: unknown) {
 
-            setFormError(apiError.message || "Ocorreu um erro desconhecido.");
-
+            if (apiError instanceof Error) {
+                setFormError(apiError.message);
+            } else {
+                setFormError("Ocorreu um erro desconhecido.");
+            }
         }
 
     };
