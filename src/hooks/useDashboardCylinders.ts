@@ -19,7 +19,7 @@ export interface DashboardCylinder {
 }
 
 export const useDashboardCylinders = () => {
-    const { data: session, status } = useSession();
+    const { status } = useSession();
     const [allCylinders, setAllCylinders] = useState<DashboardCylinder[]>([]);
     const [sectors, setSectors] = useState<SetorCompleto[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);

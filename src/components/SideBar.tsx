@@ -4,10 +4,7 @@ import {
   ArrowRightLeft,
   Archive,
   Building2,
-  HelpCircle,
   LayoutDashboard,
-  Settings,
-  User,
   Clock,
 } from "lucide-react";
 import Logo from "./Logo";

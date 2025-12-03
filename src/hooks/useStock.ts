@@ -23,7 +23,7 @@ export interface TabelaEstoqueItem {
 }
 
 export const useEstoque = () => {
-    const { data: session, status } = useSession();
+    const { status } = useSession();
     const [dados, setDados] = useState<TabelaEstoqueItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);

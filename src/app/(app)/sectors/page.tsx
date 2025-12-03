@@ -48,7 +48,7 @@ export default function SectorsPage() {
             setTimeout(() => {
                 setIsModalOpen(false);
             }, 2000);
-        } catch (error) {
+        } catch {
             setSubmitStatus({ success: false, message: "Falha ao adicionar histórico. Tente novamente." });
         } finally {
             setIsSubmitting(false);

@@ -1,9 +1,9 @@
 
 import { getSession, signOut } from "next-auth/react";
 
-const api = async <T = any>(url: string, options: RequestInit = {}): Promise<T> => {
+const api = async <T = unknown>(url: string, options: RequestInit = {}): Promise<T> => {
   console.log(`[API] Making request to: ${url}`);
-  let session = await getSession();
+  const session = await getSession();
 
   if (!session) {
     console.log("[API] No active session found. Signing out.");
@@ -48,7 +48,7 @@ const api = async <T = any>(url: string, options: RequestInit = {}): Promise<T> 
     try {
       const errorBody = await response.json();
       errorMessage = errorBody.detail || JSON.stringify(errorBody);
-    } catch (e) {
+    } catch {
       
     }
     console.error(`[API] Request to ${url} failed after retry (or initial if no 401):`, errorMessage);

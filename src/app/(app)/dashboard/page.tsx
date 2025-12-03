@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, MapPin, TrendingDown, TrendingUp } from "lucide-react";
+import { MapPin, TrendingDown, TrendingUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, Legend, Tooltip } from "recharts";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useConsumptionData } from "@/hooks/useConsumptionData";
@@ -64,8 +64,11 @@ export default function DashboardPage() {
         setSubmitStatus(null);
         setFormData({ pressao: '', codigo_serial: '', nota_fiscal: '' });
       }, 2000);
-    } catch (error: any) {
-      const errorMessage = error.message || "Falha ao registrar consumo. Verifique os dados e tente novamente.";
+    } catch (error: unknown) {
+      let errorMessage = "Falha ao registrar consumo. Verifique os dados e tente novamente.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       setSubmitStatus({ success: false, message: errorMessage });
     } finally {
       setIsSubmitting(false);

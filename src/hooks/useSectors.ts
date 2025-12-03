@@ -6,7 +6,6 @@ import {
   sectorsShowInformations,
   SectorsQuantityCylinder,
   SectorsResultNameAndId,
-  SectorsHistoryStatus 
 } from "@/services/sectorsService";
 
 
@@ -22,7 +21,7 @@ export interface UseSectorsReturn {
 }
 
 export const useSectors = (): UseSectorsReturn => {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [sectors, setSectors] = useState<SectorsResultNameAndId[]>([]);
   const [cylinderCounts, setCylinderCounts] = useState<SectorCylinderCounts>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -51,7 +50,7 @@ export const useSectors = (): UseSectorsReturn => {
           }, {} as SectorCylinderCounts);
 
          
-          const sectorList = sectorsData || [];
+          const sectorList = sectorsData.setores || [];
 
          
           setSectors(sectorList);

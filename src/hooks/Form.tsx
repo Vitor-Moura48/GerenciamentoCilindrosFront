@@ -1,9 +1,8 @@
 "use client";
 
 import Button from "@/components/Button";
-import PasswordInput from "@/hooks/PasswordInput";
 import TextInput from "@/hooks/TextInput";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Form() {  
   
