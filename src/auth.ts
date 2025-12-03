@@ -14,6 +14,8 @@ interface ApiUser {
 }
 
 async function refreshAccessToken(token: JWT) {
+  console.log("Attempting to refresh token...");
+  console.log("Sending refresh_token:", token.refreshToken);
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
       method: "POST",
@@ -22,11 +24,15 @@ async function refreshAccessToken(token: JWT) {
     });
 
     const refreshedTokens = await res.json();
+    console.log("Refresh token response status:", res.status);
+    console.log("Refreshed tokens received:", refreshedTokens);
 
     if (!res.ok) {
+      console.error("Refresh token failed with status:", res.status, refreshedTokens);
       throw refreshedTokens;
     }
 
+    console.log("Token refreshed successfully. New accessTokenExpires:", Date.now() + refreshedTokens.expires_in * 1000);
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
@@ -117,6 +123,28 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  events: {
+    async signOut({ token }) {
+      const accessToken = token.accessToken as string;
+      if (accessToken) {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+          });
+          if (!response.ok) {
+            console.error('Backend logout failed:', response.status, response.statusText);
+          } else {
+            console.log('Backend logout successful.');
+          }
+        } catch (error) {
+          console.error('Error calling backend logout endpoint:', error);
+        }
+      }
+    }
+  }
 };
 
 const handler = NextAuth(authOptions);

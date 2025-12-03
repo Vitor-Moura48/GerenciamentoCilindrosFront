@@ -32,14 +32,9 @@ const INITIAL_FORM_STATE: NewCylinderFormState = { codigo_serial: '', capacidade
 export default function EstoquePage() {
 
     const { data: session } = useSession();
-
-    const accessToken = session?.accessToken;
-
     const userId = session?.user?.id; 
 
-
-
-    const { dados, isLoading, error, updateCylinderStatus, setores, addCylinder } = useEstoque(accessToken ?? null);
+    const { dados, isLoading, error, updateCylinderStatus, setores, addCylinder } = useEstoque();
 
 
 

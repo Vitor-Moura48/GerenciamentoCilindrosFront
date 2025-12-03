@@ -26,10 +26,9 @@ const INITIAL_FORM_STATE: NewMovimentacaoForm = {
 
 export default function MovimentacaoPage() {
     const { data: session } = useSession();
-    const accessToken = session?.accessToken;
     const userId = session?.user?.id; 
 
-    const { dados, isLoading, error, setores, addMovimentacao } = useMovimentacoes(accessToken ?? null);
+    const { dados, isLoading, error, setores, addMovimentacao } = useMovimentacoes();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formState, setFormState] = useState<NewMovimentacaoForm>(INITIAL_FORM_STATE);

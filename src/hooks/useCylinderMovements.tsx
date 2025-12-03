@@ -1,6 +1,5 @@
-// hooks/useMovimentacoes.ts
-
 import { useState, useEffect, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import {
     SectorsQuantityCylinder, 
     ShowCilindro,
@@ -23,14 +22,17 @@ export interface TabelaMovimentacaoItem {
     data_consumo: string;
 }
 
-export const useMovimentacoes = (accessToken: string | null) => {
+
+export const useMovimentacoes = () => {
+    const { data: session, status } = useSession();
     const [dados, setDados] = useState<TabelaMovimentacaoItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
     const [setores, setSetores] = useState<SetorCompleto[]>([]); 
 
     const fetchData = useCallback(async () => {
-        if (!accessToken) {
+        
+        if (status !== 'authenticated') {
             setIsLoading(false);
             return;
         }
@@ -38,18 +40,17 @@ export const useMovimentacoes = (accessToken: string | null) => {
         try {
             setIsLoading(true);
             setError(null);
-
          
-            const historicoCompleto = await SectorsQuantityCylinder({ accessToken });
+           
+            const historicoCompleto = await SectorsQuantityCylinder();
 
             const dadosCompletosPromises = historicoCompleto.map(async (registro: LocalConsomeCilindro) => {
              
                 const [cilindro, setor, funcionario] = await Promise.all([
-                    ShowCilindro({ cilindro_id: registro.id_cilindro, accessToken }),
-                    ShowSetor({ id_setor: registro.id_setor, accessToken }),
-                    ShowFuncionario({ usuario_id: registro.id_usuario, accessToken })
+                    ShowCilindro({ cilindro_id: registro.id_cilindro }),
+                    ShowSetor({ id_setor: registro.id_setor }),
+                    ShowFuncionario({ usuario_id: registro.id_usuario })
                 ]);
-
               
                 return {
                     id: registro.id_local_consome_cilindro, 
@@ -70,13 +71,14 @@ export const useMovimentacoes = (accessToken: string | null) => {
         } finally {
             setIsLoading(false);
         }
-    }, [accessToken]);
+    }, [status]); 
 
     useEffect(() => {
         const getSectors = async () => {
-            if (accessToken) {
+            if (status === 'authenticated') {
                 try {
-                    const sectorsData = await fetchAllSectors({ accessToken });
+                    
+                    const sectorsData = await fetchAllSectors();
                     setSetores(sectorsData);
                 } catch (err) {
                     console.error("Erro ao carregar setores:", err);
@@ -84,11 +86,13 @@ export const useMovimentacoes = (accessToken: string | null) => {
             }
         };
 
-        if (accessToken) {
+        if (status === 'authenticated') {
             fetchData();
             getSectors();
+        } else if (status !== 'loading') {
+            setIsLoading(false);
         }
-    }, [accessToken, fetchData]);
+    }, [status, fetchData]);
 
     const addMovimentacao = async (
         data: {
@@ -99,11 +103,11 @@ export const useMovimentacoes = (accessToken: string | null) => {
         },
         id_usuario: number
     ) => {
-        if (!accessToken) throw new Error("Token de acesso não fornecido.");
+        if (status !== 'authenticated') throw new Error("Usuário não autenticado.");
 
         try {
             
-            const fetchedCylinder = await getCylinderBySerial(data.codigo_serial, accessToken);
+            const fetchedCylinder = await getCylinderBySerial(data.codigo_serial);
             if (!fetchedCylinder || !fetchedCylinder.id_cilindro) {
                 throw new Error("Cilindro não encontrado com este código serial.");
             }
@@ -114,7 +118,7 @@ export const useMovimentacoes = (accessToken: string | null) => {
                 id_usuario: id_usuario,
                 pressao: data.pressao,
                 percentual_respirador: data.percentual_respirador,
-            }, accessToken);
+            });
             
             await fetchData();
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import {
     SectorsQuantityCylinder,
     ShowCilindro,
@@ -21,14 +22,15 @@ export interface TabelaEstoqueItem {
     matricula: string;
 }
 
-export const useEstoque = (accessToken: string | null) => {
+export const useEstoque = () => {
+    const { data: session, status } = useSession();
     const [dados, setDados] = useState<TabelaEstoqueItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
     const [setores, setSetores] = useState<SetorCompleto[]>([]);
 
     const fetchData = useCallback(async () => {
-        if (!accessToken) {
+        if (status !== 'authenticated') {
             setIsLoading(false);
             return;
         }
@@ -37,7 +39,7 @@ export const useEstoque = (accessToken: string | null) => {
             setIsLoading(true);
             setError(null);
 
-            const historicoCompleto = await SectorsQuantityCylinder({ accessToken });
+            const historicoCompleto = await SectorsQuantityCylinder();
 
             const mapaEstadoAtual = new Map<number, StockRecebeCilindro>();
             for (const registro of historicoCompleto) {
@@ -50,9 +52,9 @@ export const useEstoque = (accessToken: string | null) => {
 
             const dadosCompletosPromises = estadoAtualDoEstoque.map(async (registro) => {
                 const [cilindro, setor, funcionario] = await Promise.all([
-                    ShowCilindro({ cilindro_id: registro.id_cilindro, accessToken }),
-                    ShowSetor({ id_setor: registro.id_setor, accessToken }),
-                    ShowFuncionario({ usuario_id: registro.id_usuario, accessToken })
+                    ShowCilindro({ cilindro_id: registro.id_cilindro }),
+                    ShowSetor({ id_setor: registro.id_setor }),
+                    ShowFuncionario({ usuario_id: registro.id_usuario })
                 ]);
 
                 return {
@@ -72,13 +74,13 @@ export const useEstoque = (accessToken: string | null) => {
         } finally {
             setIsLoading(false);
         }
-    }, [accessToken]);
+    }, [status]);
 
     useEffect(() => {
         const getSectors = async () => {
-            if (accessToken) {
+            if (status === 'authenticated') {
                 try {
-                    const sectorsData = await fetchAllSectors({ accessToken });
+                    const sectorsData = await fetchAllSectors();
                     setSetores(sectorsData);
                 } catch (err) {
                     console.error("Erro ao carregar setores:", err);
@@ -86,16 +88,18 @@ export const useEstoque = (accessToken: string | null) => {
             }
         };
 
-        if (accessToken) {
+        if (status === 'authenticated') {
             fetchData();
             getSectors();
+        } else if (status !== 'loading') {
+            setIsLoading(false);
         }
-    }, [accessToken, fetchData]);
+    }, [status, fetchData]);
 
     const updateCylinderStatus = async (cilindro_id: number, em_uso: boolean) => {
-        if (!accessToken) throw new Error("Token de acesso não fornecido");
+        if (status !== 'authenticated') throw new Error("Usuário não autenticado");
         try {
-            await UpdateCylinderStatus({ cilindro_id, em_uso, accessToken });
+            await UpdateCylinderStatus({ cilindro_id, em_uso });
             setDados(dados.map(item =>
                 item.id === cilindro_id ? { ...item, status: em_uso ? "Em uso" : "Disponível" } : item
             ));
@@ -115,34 +119,29 @@ export const useEstoque = (accessToken: string | null) => {
         },
         id_usuario: number
     ) => {
-        if (!accessToken) throw new Error("Token de acesso não fornecido.");
+        if (status !== 'authenticated') throw new Error("Usuário não autenticado.");
 
         try {
-            // Passo 1: Cria o cilindro.
             await createCylinder({
                 codigo_serial: data.codigo_serial,
                 capacidade: data.capacidade,
                 pressao_maxima: data.pressao_maxima,
                 em_uso: false,
-            }, accessToken);
+            });
 
-            // Passo 2: Busca o cilindro recém-criado pelo seu código serial para obter o ID.
-            const fetchedCylinder = await getCylinderBySerial(data.codigo_serial, accessToken);
+            const fetchedCylinder = await getCylinderBySerial(data.codigo_serial);
 
-            // Verificação de segurança para garantir que o cilindro foi encontrado e tem um ID.
             if (!fetchedCylinder || !fetchedCylinder.id_cilindro) {
                 throw new Error("Falha ao buscar o cilindro recém-criado: ID inválido recebido do servidor.");
             }
 
-            // Passo 3: Aloca o cilindro ao setor usando o ID obtido no passo 2.
             await assignCylinderToLocation({
                 id_cilindro: fetchedCylinder.id_cilindro,
                 id_setor: data.id_setor,
                 pressao: data.pressao_atual,
                 id_usuario: id_usuario,
-            }, accessToken);
+            });
 
-            // Atualiza a tabela na tela para refletir a nova adição.
             await fetchData();
 
         } catch (error) {

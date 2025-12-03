@@ -14,7 +14,7 @@ export default function Header() {
           {session?.user?.name ?? "Carregando..."}
         </span>
         <Button
-          onClick={() => signOut({ callbackUrl: "/" })}
+          onClick={() => signOut({ callbackUrl: "/" })} 
           className="cursor-pointer text-white bg-[#1F384C] py-2 px-3 rounded-sm"
         >
           Sair

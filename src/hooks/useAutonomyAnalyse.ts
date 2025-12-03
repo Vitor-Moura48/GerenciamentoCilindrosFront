@@ -74,7 +74,6 @@ export const useAutonomyAnalyse = (): UseAutonomyAnalyseReturn => {
       // A lógica de fetch, URL, headers, etc., está agora no autonomyService.
       const analysisResult = await analyseCylinderAutonomy({
         ...formData,
-        accessToken: session.accessToken,
       });
       
       // 3. SEM PARSE FRÁGIL

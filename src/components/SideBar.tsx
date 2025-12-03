@@ -11,8 +11,8 @@ import {
   Clock,
 } from "lucide-react";
 import Logo from "./Logo";
-import Link from "next/link"; // 1. Importe o Link
-import { usePathname } from "next/navigation"; // Opcional, mas recomendado para o estado ativo
+import Link from "next/link"; 
+import { usePathname } from "next/navigation"; 
 
 export default function SideBar() {
   const pathname = usePathname();

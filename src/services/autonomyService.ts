@@ -1,11 +1,12 @@
-// Interface para os dados que enviamos para a API.
+import api from './api';
+
+
 export interface AutonomyAnalyseParams {
   codigo_serial: string;
   cilindro_fluxo: string;
   cilindro_entubado: boolean;
   endereco_inicial: string;
   endereco_final: string;
-  accessToken: string;
 }
 
 export interface AutonomyAnalyseResult {
@@ -15,14 +16,12 @@ export interface AutonomyAnalyseResult {
   mensagem: string;
 }
 
+
 export const analyseCylinderAutonomy = async ({
   codigo_serial,
-  accessToken,
   ...queryParams
 }: AutonomyAnalyseParams): Promise<AutonomyAnalyseResult> => {
 
-  // A URL base da API deveria vir de uma variável de ambiente.
-  // Ex: process.env.NEXT_PUBLIC_API_URL
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const paramsPayload = {
@@ -34,25 +33,10 @@ export const analyseCylinderAutonomy = async ({
 
   const url = `${API_BASE_URL}/cilindros/calcular_tempo/cilindro/${codigo_serial}?${params.toString()}`;
 
-  const response = await fetch(url, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-    }
+
+  const data = await api<{ resposta: AutonomyAnalyseResult }>(url, {
+    method: 'GET',
   });
-
-  if (!response.ok) {
-    let errorMessage = `Erro na requisição: ${response.statusText}`;
-    try {
-        const errorData = await response.json();
-        
-        errorMessage = JSON.stringify(errorData.detail) || JSON.stringify(errorData);
-    } catch (e) {
-  
-    }
-    throw new Error(errorMessage);
-  }
-
-  const data = await response.json();
 
   return data.resposta;
 };

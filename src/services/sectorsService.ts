@@ -1,11 +1,16 @@
-export interface AccessTokenView{
-    accessToken: string;
-}
+import api from './api';
 
 export interface SectorsResultNameAndId{
     id_setor: number;
     setor: string;
     oxigenio: number
+}
+
+export interface HistoricoStatusSetor {
+  id_setor: number;
+  pacientes: number;
+  pontos_ativos: number;
+  duracao_media: number
 }
 
 export interface SectorsResultQuantity{
@@ -16,53 +21,29 @@ export interface SectorsResultQuantity{
       data_recebimento: string
 }
 
-export const sectorsShowInformations = async ({
-    accessToken,
-}: AccessTokenView): Promise<SectorsResultNameAndId[]> => {
-  
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+export const sectorsShowInformations = async (): Promise<{ setores: SectorsResultNameAndId[] }> => {
+
     const url = `${API_BASE_URL}/setores`;
 
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error("Erro ao buscar os dados dos setores"); 
-        }
-
-        const data: SectorsResultNameAndId[] = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Falha na requisição:", error);
-        throw error;
-    }
+    return await api<{ setores: SectorsResultNameAndId[] }>(url);
 };
 
-export const SectorsQuantityCylinder = async ({
-    accessToken,
-}: AccessTokenView): Promise<SectorsResultQuantity[]> => {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+export const SectorsQuantityCylinder = async (): Promise<{ list_local_recebe_cilindro: SectorsResultQuantity[] }> => {
+    
     const url = `${API_BASE_URL}/locais_recebe_cilindro`;
 
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        });
+   
+    return await api<{ list_local_recebe_cilindro: SectorsResultQuantity[] }>(url);
+}
 
-        if (!response.ok) {
-             throw new Error("Erro ao buscar os dados dos setores");
-        }
-        
-        const data: SectorsResultQuantity[] = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Falha na requisição:", error);
-        throw error;
-    }
+export const SectorsHistoryStatus = async (
+    payload: HistoricoStatusSetor
+): Promise<void> => {
+    const url = `${API_BASE_URL}/historico_status_setor/`;
+    await api<void>(url, {
+        method:'POST',
+        body: JSON.stringify(payload),
+    })
 }
