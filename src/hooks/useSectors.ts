@@ -36,12 +36,11 @@ export const useSectors = (): UseSectorsReturn => {
         try {
           // quantitiesData agora é uma constante local, não um estado
           const [sectorsData, quantitiesData] = await Promise.all([
-            sectorsShowInformations({ accessToken: session.accessToken }),
-            SectorsQuantityCylinder({ accessToken: session.accessToken }),
+            sectorsShowInformations({ accessToken: session.accessToken! }),
+            SectorsQuantityCylinder({ accessToken: session.accessToken! }),
           ]);
 
-          // A API retorna um objeto, então acessamos a lista dentro de 'list_local_recebe_cilindro'
-          const cylinderList = quantitiesData.list_local_recebe_cilindro || [];
+          const cylinderList = quantitiesData || [];
 
           // Usa a lista de cilindros para calcular a contagem
           const counts = cylinderList.reduce((acc, cylinder) => {
@@ -51,7 +50,7 @@ export const useSectors = (): UseSectorsReturn => {
           }, {} as SectorCylinderCounts);
 
           // A API de setores também retorna um objeto, então acessamos a lista dentro de 'setores'
-          const sectorList = sectorsData.setores || [];
+          const sectorList = sectorsData || [];
 
           // Atualiza os estados que realmente serão usados pela UI
           setSectors(sectorList);
