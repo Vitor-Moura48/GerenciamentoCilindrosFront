@@ -75,8 +75,13 @@ export default function MovimentacaoPage() {
                 percentual_respirador: Number(formState.percentual_respirador),
             }, Number(userId));
             setIsModalOpen(false);
-        } catch (apiError: any) {
-            setFormError(apiError.message || "Ocorreu um erro.");
+        } catch (apiError: unknown) {
+            
+            if (apiError instanceof Error) {
+                setFormError(apiError.message);
+            } else {
+                setFormError("Ocorreu um erro desconhecido.");
+            }
         }
     };
 
