@@ -50,7 +50,6 @@ async function refreshAccessToken(token: JWT) {
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
-  trustHost: true,
   providers: [
     Credentials({
       name: "Credentials",
