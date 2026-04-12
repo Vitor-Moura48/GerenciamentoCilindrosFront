@@ -2,7 +2,7 @@
 import { getSession, signOut } from "next-auth/react";
 
 // URL do backend (conferida com next.config.ts)
-const BACKEND_BASE_URL = "http://44.220.143.197:8080";
+const BACKEND_BASE_URL = "http://52.90.83.126:8080";
 
 // Função para converter URLs do backend direto para usar o proxy
 const convertToProxyUrl = (url: string): string => {
