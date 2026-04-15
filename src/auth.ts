@@ -17,10 +17,13 @@ async function refreshAccessToken(token: JWT) {
   console.log("Attempting to refresh token...");
   console.log("Sending refresh_token:", token.refreshToken ? "[REDACTED]" : "missing");
   try {
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/auth/refresh`, {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
+    const res = await fetch(`${backendUrl}/auth/refresh`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true"
+      },
       body: JSON.stringify({ refresh_token: token.refreshToken }),
     });
 
@@ -60,23 +63,35 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         try {
-          const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-          const res = await fetch(`${baseUrl}/api/auth/login`, {
+          console.log('[NextAuth] BACKEND_URL env:', process.env.BACKEND_URL);
+          const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
+          const loginUrl = `${backendUrl}/auth/login`;
+          
+          console.log('[NextAuth] Tentando conectar em:', loginUrl);
+          console.log('[NextAuth] Credenciais:', { matricula: credentials?.matricula, senha: '***' });
+          
+          const res = await fetch(loginUrl, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "true"
+            },
             body: JSON.stringify({
               matricula: credentials?.matricula,
               senha: credentials?.senha,
             }),
           });
 
+          console.log('[NextAuth] Resposta recebida! Status:', res.status);
+          const responseText = await res.text();
+          console.log('[NextAuth] Response (primeiros 200 chars):', responseText.substring(0, 200));
+
           if (!res.ok) {
-            const responseBody = await res.text();
-            console.error("Falha na autenticação:", res.status, responseBody);
+            console.error("Falha na autenticação:", res.status, responseText.substring(0, 200));
             return null;
           }
 
-          const user: ApiUser = await res.json();
+          const user: ApiUser = JSON.parse(responseText);
           if (user && user.id_usuario) {
             return { ...user, id: String(user.id_usuario) };
           }
@@ -131,11 +146,12 @@ const handler = NextAuth({
       const accessToken = token.accessToken as string;
       if (accessToken) {
         try {
-          const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-          const response = await fetch(`${baseUrl}/api/auth/logout`, {
+          const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
+          const response = await fetch(`${backendUrl}/auth/logout`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${accessToken}`,
+              'ngrok-skip-browser-warning': 'true'
             },
           });
           if (!response.ok) {
