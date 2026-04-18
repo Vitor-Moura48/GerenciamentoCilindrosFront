@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'https://rework-book-antirust.ngrok-free.dev';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,4 +53,4 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-}}
+}
