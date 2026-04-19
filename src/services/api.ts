@@ -21,6 +21,8 @@ const api = async <T = unknown>(url: string, options: RequestInit = {}): Promise
     const headers = {
       ...options.headers,
       'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': '69420',  // 🔧 Valor correto do ngrok (não é true, é um número mágico)
+      'User-Agent': 'PostmanRuntime/7.32.3', // 🔧 Identifica como cliente confiável
       ...(token && { 'Authorization': `Bearer ${token}` }),
     };
     console.log(`[API] Attempt ${attempt}: Fetching ${url}`);
@@ -46,13 +48,34 @@ const api = async <T = unknown>(url: string, options: RequestInit = {}): Promise
 
   if (!response.ok) {
     let errorMessage = `Erro: ${response.status} ${response.statusText}`;
-    try {
-      const errorBody = await response.json();
-      errorMessage = errorBody.detail || JSON.stringify(errorBody);
-    } catch {
-      
+    
+    // 🔴 DEBUG: Pega a resposta COMPLETA em texto
+    const responseText = await response.text();
+    
+    console.error('[API] ❌ ERRO DETECTADO');
+    console.error('[API] URL:', url);
+    console.error('[API] Status:', response.status);
+    console.error('[API] Content-Type:', response.headers.get('content-type'));
+    console.error('[API] Resposta (primeiros 500 chars):', responseText.substring(0, 500));
+    
+    // Se é HTML (error page do backend ou navegador), mostra aviso
+    if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
+      console.error('[API] ⚠️ Backend retornou HTML em vez de JSON!');
+      console.error('[API] Possíveis causas:');
+      console.error('[API]   1. Endpoint não existe');
+      console.error('[API]   2. Backend quebrou (erro 500)');
+      console.error('[API]   3. CORS bloqueado pelo navegador');
+      errorMessage = `Erro do backend: ${response.status}. Verifique os logs do servidor.`;
+    } else {
+      // Tenta parsear como JSON para dar uma mensagem melhor
+      try {
+        const errorBody = JSON.parse(responseText);
+        errorMessage = errorBody.detail || JSON.stringify(errorBody);
+      } catch {
+        errorMessage = responseText.substring(0, 200);
+      }
     }
-    console.error(`[API] Request to ${url} failed after retry (or initial if no 401):`, errorMessage);
+    
     throw new Error(errorMessage);
   }
 
@@ -62,7 +85,28 @@ const api = async <T = unknown>(url: string, options: RequestInit = {}): Promise
   }
 
   console.log(`[API] Request to ${url} successful.`);
-  return response.json() as Promise<T>;
+  
+  // 🔴 ADICIONAR LOGS AQUI
+  const responseText = await response.text();
+  console.log('[API] Response Content-Type:', response.headers.get('content-type'));
+  console.log('[API] Response length:', responseText.length);
+  console.log('[API] Response (primeiros 300 chars):', responseText.substring(0, 300));
+  
+  // ⚠️ DETECTOR: Status 200 mas retornou HTML!
+  if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
+    console.error('[API] ❌ ALERTA: Status 200 mas conteúdo é HTML!');
+    console.error('[API] URL:', url);
+    console.error('[API] HTML:', responseText.substring(0, 500));
+    throw new Error('Backend retornou HTML em vez de JSON (Status 200)');
+  }
+  
+  try {
+    return JSON.parse(responseText) as Promise<T>;
+  } catch (e) {
+    console.error('[API] Erro ao fazer parse do JSON:', e);
+    console.error('[API] Response:', responseText);
+    throw new Error('Resposta inválida do servidor');
+  }
 };
 
 export default api;
